@@ -1,0 +1,110 @@
+/*
+  O código está comentado, explicando resumidamente as etapas da execução do mesmo :)
+*/
+
+/*
+Código para ler todas as cores da página `https://www.w3schools.com/tags/ref_colornames.asp` e armazenar no vetor `vetorCores`
+*/
+
+/*
+
+"O JOGO" IRÁ INICIAR ASSIM QUE O CÓDIGO FOR EXECUTADO, DIGITE game() SE NECESSÁRIO
+
+*/
+function get_colors(){
+    const vetorCores = []
+
+    for(let i = 1; i <= 148; i++){
+        const corNome = document.querySelector(`#box${i} > span > a`).innerText.toLowerCase()
+        vetorCores.push(corNome)
+    }
+
+    return vetorCores
+}
+
+/*
+Função para solicitar ao usuário e definir a dificuldade do jogo
+*/
+function escolherDificuldade() {
+    let dificuldade;
+    while (!dificuldade) {
+        dificuldade = prompt("Escolha a dificuldade do jogo:\n1. Easy (5 cores)\n2. Normal (10 cores)\n3. Hard (15 cores)");
+        switch (dificuldade) {
+            case '1':
+                return 5; // Fácil
+            case '2':
+                return 10; // Normal
+            case '3':
+                return 15; // Difícil
+            default:
+                alert("Opção inválida! Por favor, escolha 1, 2 ou 3.");
+                dificuldade = null; // Reinicia a variável para repetir o loop
+        }
+    }
+}
+
+/*
+Função que escolhe `quantidade` de cores aleatórias armazenadas no vetor de cores para serem usadas na função game
+*/
+function select_colors(quantidade, vetorCores){
+    let vetorSelecionados = []
+
+    for(let i = 0; i < quantidade; i++){
+        let i_aleatorio = Math.floor(Math.random() * vetorCores.length)
+        let cor_selecionada = vetorCores.splice(i_aleatorio, 1)
+        vetorSelecionados = [...vetorSelecionados, ...cor_selecionada]
+    }
+
+    return vetorSelecionados
+}
+
+function game() {
+    const quantidadeCores = escolherDificuldade(); // Chama a função para escolher a dificuldade
+    const vetorCores = select_colors(quantidadeCores, get_colors());
+    
+    // Exibir dicas sobre as cores disponíveis
+    console.log("Dica: As cores disponíveis são:", vetorCores.join(', ')); // Mostra as cores disponíveis
+
+    alert("Jogo de escolher cores!\nDescubra sua idade mental jogando esse jogo super divertido!\nSelecione uma das cores a seguir:\n" + 
+          vetorCores.map((cor, index) => `${index + 1}. ${cor}`).join('\n'));
+
+    const coresDisplay = vetorCores.splice(Math.floor(Math.random() * vetorCores.length), 1)[0];
+    console.log("Cor escolhida pelo computador:", coresDisplay); // Mostra a cor escolhida pelo computador
+    let tentativas = 0;
+    let dicaUsada = false; // Variável para controlar se a dica foi usada
+
+    do { // Função que confere se a escolha está certa
+        let cor_escolhida = prompt("Escolha uma cor:\nCores possíveis:\n" + vetorCores + "\nDigite 'dica' para exibir uma dica");
+
+        if (cor_escolhida.toLowerCase() === 'dica' && !dicaUsada) {
+            // Lógica para dar a dica
+            let indiceAleatorio;
+            do {
+                indiceAleatorio = Math.floor(Math.random() * vetorCores.length);
+            } while (vetorCores[indiceAleatorio] === coresDisplay); // Garante que não remova a cor correta
+
+            const corRemovida = vetorCores.splice(indiceAleatorio, 1)[0]; // Remove a cor aleatória
+            alert(`Dica: A cor ${corRemovida} não é a resposta correta!`);
+
+            // Mostra novamente as cores disponíveis
+            alert("Cores restantes:\n" + vetorCores.map((cor, index) => `${index + 1}. ${cor}`).join('\n'));
+            dicaUsada = true; // Marca que a dica foi usada
+            continue; // Retorna ao início do loop para nova escolha
+        }
+
+        tentativas += 1; // Incrementa o número de tentativas
+
+        if (coresDisplay === cor_escolhida) {
+            alert("Parabéns, você ganhou");
+            return;
+        } else {
+            if (tentativas > 2) {
+                alert("GAME OVER");
+            } else {
+                alert("Tente novamente");
+            }
+        }
+    } while (tentativas < 3);
+}
+
+game()
